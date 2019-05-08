@@ -16,9 +16,25 @@ defmodule EJSONWrapper do
       iex> EJSONWrapper.decrypt("file_path/file.ejson", ejson_keydir: "/path_to/ejson_keys")
       {:ok, %{"key" => "value"}}
 
+      iex> EJSONWrapper.decrypt("file_path/file.ejson", private_key: "REDACTED")
+      {:ok, %{"key" => "value"}}
+
   """
   def decrypt(file_path, ejson_keydir: ejson_keydir) do
     case Porcelain.exec("ejson", ["decrypt", file_path], err: :out, env: [{"EJSON_KEYDIR", ejson_keydir}]) do
+      %Result{err: :out, out: output, status: 0} ->
+        sanitized_output = output
+                          |> json_decode
+                          |> sanitize
+        {:ok, sanitized_output}
+
+      %Result{err: :out, out: output, status: 1} ->
+        {:error, "#{output}"}
+    end
+  end
+
+  def decrypt(file_path, private_key: private_key) do
+    case Porcelain.exec("ejson", ["decrypt", file_path, "--key-from-stdin"], err: :out, in: private_key) do
       %Result{err: :out, out: output, status: 0} ->
         sanitized_output = output
                           |> json_decode

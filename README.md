@@ -74,6 +74,14 @@ EJSONWrapper.decrypt('myfile.ejson')
 # => {:ok, %{"my_api_key" => "key"}}
 ```
 
+#### Decrypting EJSON file given private key in memory
+
+```elixir
+# Private key is in /opt/ejson/keys
+EJSONWrapper.decrypt('myfile.ejson', private_key: "be8597abaa68bbfa23193624b1ed5e2cd6b9a8015e722138b23ecd3c90239b2d")
+# => {:ok, %{"my_api_key" => "key"}}
+```
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/envato/ex_ejson_wrapper.
