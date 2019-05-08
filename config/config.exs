@@ -7,8 +7,7 @@ config :ex_ejson_wrapper,
   ejson_keydir: "/opt/ejson/keys"
 
 config :porcelain,
-  driver: Porcelain.Driver.Goon,
-  goon_driver_path: "bin/goon_darwin_amd64"
+  driver: Porcelain.Driver.Basic
 
 # and access this configuration in your application as:
 #

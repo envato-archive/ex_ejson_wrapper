@@ -31,7 +31,7 @@ defmodule EJSONWrapper do
   end
 
   def decrypt(file_path, private_key: private_key) do
-    case Porcelain.exec("ejson", ["decrypt", file_path, "--key-from-stdin"], err: :out, in: private_key) do
+    case Porcelain.shell("echo \"#{private_key}\" | ejson decrypt #{file_path} --key-from-stdin", err: :out) do
       %Result{err: :out, out: output, status: 0} ->
         sanitized_output = output
                           |> json_decode
