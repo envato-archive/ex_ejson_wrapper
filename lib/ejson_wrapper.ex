@@ -21,15 +21,12 @@ defmodule EJSONWrapper do
 
   """
   def decrypt(file_path, ejson_keydir: ejson_keydir) do
-    case Porcelain.exec("ejson", ["decrypt", file_path], err: :out, env: [{"EJSON_KEYDIR", ejson_keydir}]) do
-      %Result{err: :out, out: output, status: 0} ->
-        sanitized_output = output
-                          |> json_decode
-                          |> sanitize
-        {:ok, sanitized_output}
-
-      %Result{err: :out, out: output, status: 1} ->
-        {:error, "#{output}"}
+    with {:ok, private_key_path} <- read_ejson_file(file_path, ejson_keydir),
+         {:ok, private_key} <- read_private_key(private_key_path)
+    do
+      decrypt(file_path, private_key: private_key)
+    else
+      err -> err
     end
   end
 
@@ -48,6 +45,27 @@ defmodule EJSONWrapper do
 
   def decrypt(file_path) do
     decrypt(file_path, ejson_keydir: Application.get_env(:ex_ejson_wrapper, :ejson_keydir))
+  end
+
+  defp read_private_key(file_path) do
+    case File.read(file_path) do
+      {:ok, private_key} ->
+        {:ok, private_key}
+      {:error, :enoent} ->
+        {:error, "Decryption failed: stat #{file_path}: no such file or directory"}
+    end
+  end
+
+  defp read_ejson_file(file_path, ejson_keydir) do
+    case File.read(file_path) do
+      {:ok, ejson_string} ->
+        ejson_map = json_decode(ejson_string)
+        private_key_path = ejson_keydir <> "/" <> ejson_map["_public_key"]
+
+        {:ok, private_key_path}
+      {:error, :enoent} ->
+        {:error, "Decryption failed: stat #{file_path}: no such file or directory"}
+    end
   end
 
   defp json_decode(json_string) do
