@@ -69,15 +69,20 @@ config :ex_ejson_wrapper,
 #### Decrypting EJSON file
 
 ```elixir
-# Private key is in /opt/ejson/keys
+# Private key is in Application.get_env(:ex_ejson_wrapper, :ejson_keydir))
 EJSONWrapper.decrypt('myfile.ejson')
+# => {:ok, %{"my_api_key" => "key"}}
+```
+
+```elixir
+# Explicitly declare ejson_keydir
+EJSONWrapper.decrypt('myfile.ejson', ejson_keydir: 'path_to/ejson/keys')
 # => {:ok, %{"my_api_key" => "key"}}
 ```
 
 #### Decrypting EJSON file given private key in memory
 
 ```elixir
-# Private key is in /opt/ejson/keys
 EJSONWrapper.decrypt('myfile.ejson', private_key: "be8597abaa68bbfa23193624b1ed5e2cd6b9a8015e722138b23ecd3c90239b2d")
 # => {:ok, %{"my_api_key" => "key"}}
 ```
