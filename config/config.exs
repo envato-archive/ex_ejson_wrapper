@@ -6,7 +6,7 @@ config :ex_ejson_wrapper,
   json_codec: Jason,
   ejson_keydir: "/opt/ejson/keys"
 
-#
+config :porcelain, driver: Porcelain.Driver.Basic
 # and access this configuration in your application as:
 #
 #     Application.get_env(:ex_ejson_wrapper, :key)

@@ -1,4 +1,6 @@
 defmodule EJSONWrapper do
+  alias Porcelain.Result
+
   @moduledoc """
   Decrypt EJSON file
   """
@@ -16,15 +18,14 @@ defmodule EJSONWrapper do
 
   """
   def decrypt(file_path, ejson_keydir: ejson_keydir) do
-    opts = [stderr_to_stdout: true, env: [{"EJSON_KEYDIR", ejson_keydir}]]
-    case System.cmd("ejson", ["decrypt", file_path], opts) do
-      {output, 0} ->
+    case Porcelain.exec("ejson", ["decrypt", file_path], err: :out, env: [{"EJSON_KEYDIR", ejson_keydir}]) do
+      %Result{err: :out, out: output, status: 0} ->
         sanitized_output = output
                           |> json_decode
                           |> sanitize
-
         {:ok, sanitized_output}
-      {output, _exit_status} ->
+
+      %Result{err: :out, out: output, status: 1} ->
         {:error, "#{output}"}
     end
   end

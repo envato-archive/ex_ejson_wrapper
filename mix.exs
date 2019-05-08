@@ -21,6 +21,7 @@ defmodule EJSONWrapper.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:porcelain, "~> 2.0"},
       {:jason, "~> 1.1", optional: true}
     ]
   end
